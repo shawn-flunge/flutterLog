@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'store.dart';
+import '../../store.dart';
 
 const TextStyle textStyleInUtil = TextStyle(color: Colors.blue, fontSize: 15.0);
 
@@ -11,7 +11,40 @@ class InteractiveTutorial extends StatefulWidget {
   InteractiveTutorialState createState() => InteractiveTutorialState();
 }
 
-class InteractiveTutorialState extends State<InteractiveTutorial> {
+class InteractiveTutorialState extends State<InteractiveTutorial> with TickerProviderStateMixin{
+
+
+  Size defaultSize = const Size(30,30);
+  Size clicked = const Size(50,50);
+
+  Animation<Size> size;
+  AnimationController controller;
+  
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300)
+    );
+
+    size = SizeTween(
+      begin: defaultSize,
+      end: clicked
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Interval( 0.0, 1.000,
+          curve: Curves.easeInOutBack
+        ),   
+      )
+    );
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,30 +115,39 @@ class InteractiveTutorialState extends State<InteractiveTutorial> {
               ],
             ),
           ),
+          gogo.isLiked ?
           InkWell(
-            child: gogo.isLiked ?
-              Icon(
-                Icons.star,
-                color: Colors.red,
-                size: 30,
-              ) :
-              Icon(
+            child:AnimatedBuilder(
+              animation: controller, 
+              builder: (context,child){
+                return Icon(Icons.star,size: size.value.width,color: Colors.red,);
+              }
+            ),
+            onTap: () async{
+              // controller.forward().then((value) => controller.reverse());
+              await controller.forward();
+              await controller.reverse();
+              setState(() {
+                gogo.isLiked = false;
+                gogo.like --;
+              });
+            },
+          ):
+          InkWell(
+            child:Icon(
                 Icons.star_border_outlined,
                 color: Colors.red,
                 size: 30,
               ),
             onTap: (){
+              
               setState(() {
-                if(gogo.isLiked == false){
-                  gogo.isLiked = true;
-                  gogo.like ++;
-                }else{
-                  gogo.isLiked = false;
-                  gogo.like --;
-                }                
+                gogo.isLiked = true;
+                gogo.like ++;
               });
+              controller.forward().then((value) => controller.reverse());
             },
-          ),         
+          ),    
           Text(gogo.like.toString(),
             style: TextStyle(
               fontSize: 15.0

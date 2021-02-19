@@ -53,8 +53,8 @@ class AnimationExState extends State<AnimationEx> {
             // buildOpacity(),
             // buildAnimatedOpacity(),
             buildAdvancedOpacity(),
-            // buildFadeInImage(),
-            //buildAnimatedContainer()
+            buildFadeInImage(),
+            buildAnimatedContainer()
           ],
         ),
       ),
